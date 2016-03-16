@@ -14,6 +14,7 @@ import org.apache.spark.ml.classification.{LogisticRegression, LogisticRegressio
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.mllib.tree.RandomForest
 import org.apache.spark.mllib.tree.model.RandomForestModel
+import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 import org.apache.spark.rdd.RDD
 
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SQLContext}
@@ -221,7 +222,7 @@ object MLHelper {
     * @param testData - RDD[LabeledPoint] for test data
     * @param rfm - Built RandomForest Model
     */
-  def TestRandomForestModel(testData : RDD[LabeledPoint],rfm : RandomForestModel) : Unit = {
+  def TestRandomForestModel(testData : RDD[LabeledPoint],rfm : RandomForestModel) : RDD[(Double, Double)] = {
     val labelAndPreds = testData.map { point =>
       val prediction = rfm.predict(point.features)
       (point.label, prediction)
@@ -229,6 +230,7 @@ object MLHelper {
     val testErr = labelAndPreds.filter(r => r._1 != r._2).count().toDouble / testData.count()
     println("Test Error = " + testErr)
     println("Learned classification tree model:\n" + rfm.toDebugString)
+    return labelAndPreds
   }
 }
 
@@ -259,6 +261,9 @@ object test1 {
     //Built RandomForest Model
     val randomForestBuiltModel = MLHelper.TrainRandomForest(parsedData)
     // Evaluate model on test instances and compute test error
-    MLHelper.TestRandomForestModel(testDataMapped,randomForestBuiltModel)
+    val rfResults = MLHelper.TestRandomForestModel(testDataMapped,randomForestBuiltModel)
+    val metrics = new BinaryClassificationMetrics(rfResults)
+    val auROC = metrics.areaUnderROC()
+    println("Area under ROC ="+auROC)
   }
 }
