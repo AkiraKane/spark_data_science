@@ -10,6 +10,7 @@ import htsjdk.samtools.SamReaderFactory
 import org.bdgenomics.adam.converters.SAMRecordConverter
 import org.bdgenomics.adam.models.{RecordGroupDictionary, SequenceDictionary, SequenceRecord}
 import org.bdgenomics.adam.rdd.ADAMContext
+import utils.SetUpSpark
 
 class AdamExample1 {
 
