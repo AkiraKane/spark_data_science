@@ -110,6 +110,7 @@ object GraphTute {
     // Run PageRank algorithm, and show results.
     val results = g.pageRank.resetProbability(0.01).maxIter(5).run()
     results.vertices.select("id", "pagerank").show()
-
+    val resultLPA = g.labelPropagation.maxIter(5).run()
+    resultLPA.show()
   }
 }
