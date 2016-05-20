@@ -38,7 +38,7 @@ object TwitterStreaming {
     System.setProperty("twitter4j.oauth.consumerSecret",args(2))
     System.setProperty("twitter4j.oauth.accessToken",args(3))
     System.setProperty("twitter4j.oauth.accessTokenSecret",args(4))
-    val dataToFilterOn = Array("camping")
+    val dataToFilterOn = Array("#BOG16","#GWAS","#CRISPR")
     val tweetStream = TwitterUtils.createStream(ssc, None,dataToFilterOn).map(gson.toJson(_))
 
     tweetStream.foreachRDD((rdd, time) => {
