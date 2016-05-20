@@ -15,7 +15,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 /**
   * Collect at least the specified number of tweets into json text files.
   */
-object twitterStreaming {
+object TwitterStreaming {
   private var numTweetsCollected = 0L
   private var partNum = 0
   private var gson = new Gson()
@@ -38,7 +38,7 @@ object twitterStreaming {
     System.setProperty("twitter4j.oauth.consumerSecret",args(2))
     System.setProperty("twitter4j.oauth.accessToken",args(3))
     System.setProperty("twitter4j.oauth.accessTokenSecret",args(4))
-    val dataToFilterOn = Array("swimming")
+    val dataToFilterOn = Array("camping")
     val tweetStream = TwitterUtils.createStream(ssc, None,dataToFilterOn).map(gson.toJson(_))
 
     tweetStream.foreachRDD((rdd, time) => {

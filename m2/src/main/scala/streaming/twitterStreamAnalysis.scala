@@ -10,7 +10,7 @@ import org.apache.spark.mllib.linalg.{Vector, Vectors}
 /**
   * Created by edwardcannon on 16/04/2016.
   */
-object twitterStreamAnalysis {
+object TwitterStreamAnalysis {
 
   /**
     * Converts tweet to vector
@@ -30,26 +30,18 @@ object twitterStreamAnalysis {
   def main(args: Array[String]): Unit = {
     val conf = new SparkConf().setAppName(this.getClass.getSimpleName).setMaster("local[2]")
     val sc = new SparkContext(conf)
-    var gson = new Gson()
-    val jsonParser = new JsonParser()
-    val tweets = sc.textFile(args(0))
-    for (tweet <- tweets.take(5)) {
-      println(gson.toJson(jsonParser.parse(tweet)))
-    }
     val sqlContext = new SQLContext(sc)
     //auto infer schema from json
-    val tweetTable = sqlContext.read.json(args(1))
+    val tweetTable = sqlContext.read.json(args(0))
     tweetTable.registerTempTable("tweetTable")
     tweetTable.printSchema()
-    sqlContext.sql(
-    "SELECT user.lang, COUNT(*) as cnt FROM tweetTable " +
-      "GROUP BY user.lang ORDER BY cnt DESC limit 100").collect().foreach(println)
     println("--- Training the model and persist it")
-    val texts = sqlContext.sql("SELECT text from tweetTable").map(_.toString)
+    val texts = sqlContext.sql("SELECT text FROM tweetTable LIMIT 50").map(_.toString)
+    texts.foreach(println)
     val vectors = texts.map(featurize).cache()
     println(vectors.count())
     val model = KMeans.train(vectors, 10, 20)
-    val some_tweets = texts.take(100)
+    val some_tweets = texts.take(50)
     for (i <- 0 until 10) {
       println(s"\nCLUSTER $i:")
       some_tweets.foreach { t =>
